@@ -1,4 +1,4 @@
-//Version 3 (Done!!!)
+//Version 4 (Improved logic on checking condition)
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
@@ -54,13 +54,8 @@ void merging(int array[4]){
 
 void wholeProcess(int array[4]){
     int arrayTest[4] = {0};
-    //printf("Before: ");
-    //printArray(array);
-    //copyArray(array, arrayTest);
     moveArray(array);
     merging(array);
-    //printf("After:  ");
-    //printArray(arrayTest);
 }
 
 void spliting2D(int array2D[4][4], int array1D[4], int i){
@@ -141,45 +136,23 @@ void drawingSym(char character, int repeat, int space, int frequency){
     printf("\n");
 }
 
+int power(int num, int pow){
+    int result = 1;
+    while (pow > 0){
+        result *= num;
+        pow --;
+    }
+    return result;
+}
+
 void drawingNum(int square[4][4], int i){
     
     for (int j = 0; j < 4; j++){
         printf("|");
-        if(square[i][j] == 0){
+        if(square[i][j] == 0)
             printf("%5s", " ");
-        } else if(square[i][j] == 1){
-            printf("%5s", "2");
-        }else if(square[i][j] == 2){
-            printf("%5s", "4");
-        }else if(square[i][j] == 3){
-            printf("%5s", "8");
-        }else if(square[i][j] == 4){
-            printf("%5s", "16");
-        }else if(square[i][j] == 5){
-            printf("%5s", "32");
-        }else if(square[i][j] == 6){
-            printf("%5s", "64");
-        }else if(square[i][j] == 7){
-            printf("%5s", "128");
-        }else if(square[i][j] == 8){
-            printf("%5s", "256");
-        }else if(square[i][j] == 9){
-            printf("%5s", "512");
-        }else if(square[i][j] == 10){
-            printf("%5s", "1024");
-        }else if(square[i][j] == 11){
-            printf("%5s", "2048");
-        }else if(square[i][j] == 12){
-            printf("%5s", "4096");
-        }else if(square[i][j] == 13){
-            printf("%5s", "8192");
-        }else if(square[i][j] == 14){
-            printf("%5s", "16384");
-        }else if(square[i][j] == 15){
-            printf("%5s", "32768");
-        }else if(square[i][j] == 16){
-            printf("%5s", "65536");
-        }
+        else
+            printf("%5d", power(2, square[i][j]));
     }
     printf("|");
     printf("\n");
@@ -194,24 +167,6 @@ void printing (int array2D[4][4]){
         printf(" ");
         drawingSym('-', 5, 1, 4);
     }
-    /*for(int i = 0; i < 4; i++){
-        for(int j = 0; j < 4; j++){
-            printf("%d ", array2D[i][j]);
-        }
-        printf("\n");
-    }*/
-}
-
-/*void after2D(int array2D [4][4]){
-    printf("After:\n");
-    for(int i = 0; i < 4; i++){
-        for(int j = 0; j < 4; j++){
-            printf("%d ", array2D[i][j]);
-        }
-        printf("\n");
-    }
-}*/
-
 void userControl(int array2D[4][4]){
     char input;
     int backup[4][4];
@@ -247,38 +202,48 @@ void userControl(int array2D[4][4]){
     printf("Invalid input since no changes:(\n");
 }
 
+
+
+void checking_adj(int &signal, int array2D[4][4], int i, int j){
+    if(i == 3 && j == 3)
+        return;
+    if (i < 3 && j <= 3){
+        if (array2D[i][j] == array2D[i + 1][j]){
+            signal += 1;
+            return;
+        } else {
+            checking_adj (signal, array2D, i + 1, j);
+        }
+    }
+    if (i <= 3 && j < 3){
+        if (array2D[i][j] == array2D[i][j + 1]){
+            signal += 1;
+            return;
+        } else {
+            checking_adj (signal, array2D, i, j + 1);
+        }
+    }
+    return;
+}
+
 int condition(int array2D[4][4]){
     for(int i = 0; i < 4; i++){
         for(int j = 0; j < 4; j++){
             if(array2D[i][j] == 0){
                 return 1;
             }
-            if(array2D[i][2] == 11){
+            if(array2D[i][j] == 11){
                 return 2;
             }
-            if(0 <= i + 1 && i + 1 <= 3){
-                if(array2D[i][j] == array2D[i + 1][j]){
-                    return 1;
-                }
-            }
-            if(0 <= i - 1 && i - 1 <= 3){
-                if(array2D[i][j] == array2D[i - 1][j]){
-                    return 1;
-                }
-            }
-            if(0 <= j + 1 && j + 1 <= 3){
-                if(array2D[i][j] == array2D[i][j + 1]){
-                    return 1;
-                }
-            }
-            if(0 <= j - 1 && j - 1 <= 3){
-                if(array2D[i][j] == array2D[i][j - 1]){
-                    return 1;
-                }
-            }
+
         }
     }
-    return 0;
+    int signal = 0;
+    checking_adj(signal, array2D, 0, 0);
+    if (signal == 0)
+        return 0;
+    else 
+        return 1;
 }
 
 int main (){
@@ -295,24 +260,6 @@ int main (){
         printf("You win!!!");
     }
     
-    /* for (int i = 0; i < 4; i++){
-        array0[i]++;
-        wholeProcess(array0);
 
-        for(int j = i + 1; j < 4; j++){
-        array0[j]++;
-        wholeProcess(array0);
-        array0[j]--;
-        }
-        array0[i]--;
-    }
-    for (int i = 0; i < 4; i++){
-        array1[i]--;
-        wholeProcess(array1);
-        array1[i]++;
-    }
-    wholeProcess(array0); */
-    
-  
     
 }
